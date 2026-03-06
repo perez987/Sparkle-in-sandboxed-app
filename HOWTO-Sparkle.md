@@ -44,17 +44,15 @@ You must generate a key pair and add the **public key** to `Info.plist`.
 
 ### Steps
 
-```bash
-# 1. Locate generate_keys inside the resolved Sparkle package
-#    (Xcode downloads packages to ~/Library/Developer/Xcode/DerivedData/<project>/SourcePackages/)
-#    Or download Sparkle-2.x.x.tar.xz from GitHub releases:
-#    https://github.com/sparkle-project/Sparkle/releases
+1. Locate generate_keys inside the resolved Sparkle package (Xcode downloads packages to `~/Library/Developer/Xcode/DerivedData/<project>/SourcePackages/`) or download Sparkle-2.x.x.tar.xz from GitHub [releases](https://github.com/sparkle-project/Sparkle/releases)
+2. Extract the binary distribution and run generate_keys
 
-# 2. Extract the binary distribution and run generate_keys
+```bash
 ./bin/generate_keys
 ```
 
 The tool will:
+
 - Print a **private key** — save it safely (e.g. in macOS Keychain). **Never commit it.**
 - Print a **public key** (Base64 string).
 
@@ -67,7 +65,7 @@ Open `Sparkle-test/Info.plist` and replace `REPLACE_WITH_YOUR_PUBLIC_ED_KEY`:
 <string>YOUR_BASE64_PUBLIC_KEY_HERE</string>
 ```
 
-> **Important:** Without the correct `SUPublicEDKey`, Sparkle will refuse to install updates.
+**Important:** Without the correct `SUPublicEDKey`, Sparkle will refuse to install updates.
 
 ## 5. Set Up an Appcast Feed
 
