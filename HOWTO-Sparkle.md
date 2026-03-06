@@ -11,7 +11,7 @@ This file describes everything you need to do after cloning this repository to b
 | Xcode | 14 or later (15+ recommended) |
 | macOS | 12 Monterey or later (build host) |
 | Apple Developer Account | Required for code signing |
-| Sparkle | 2.x — added via Swift Package Manager (automatic) |
+| Sparkle | 2.x — added via Swift Package Manager |
 
 ---
 
@@ -21,8 +21,6 @@ This file describes everything you need to do after cloning this repository to b
 2. Xcode will automatically resolve the **Sparkle** Swift Package dependency from  
    `https://github.com/sparkle-project/Sparkle` (version ≥ 2.0.0).  
    Wait for the "Resolving Package Graph" spinner to finish.
-
----
 
 ## 3. Configure Code Signing
 
@@ -34,12 +32,10 @@ This file describes everything you need to do after cloning this repository to b
    - The **Bundle Identifier** is pre-set to `com.example.Sparkle-test`.  
      Change it to something unique, e.g. `com.yourname.Sparkle-test`.
 
-> **About "ad-hoc" signing with your Apple ID:**  
-> For running on your own Mac (outside App Store / Gatekeeper), sign with your personal  
-> *Apple Development* certificate. This requires a free or paid Apple Developer account.  
-> You do **not** need a Developer ID certificate unless you distribute to other machines.
+**About "ad-hoc" signing with your Apple ID:**  
 
----
+For running on your own Mac (outside App Store / Gatekeeper), sign with your personal *Apple Development* certificate. This requires a free or paid Apple Developer account.  
+You do **not** need a Developer ID certificate unless you distribute to other machines.
 
 ## 4. Generate Sparkle EdDSA Keys
 
@@ -72,8 +68,6 @@ Open `Sparkle-test/Info.plist` and replace `REPLACE_WITH_YOUR_PUBLIC_ED_KEY`:
 ```
 
 > **Important:** Without the correct `SUPublicEDKey`, Sparkle will refuse to install updates.
-
----
 
 ## 5. Set Up an Appcast Feed
 
@@ -111,7 +105,7 @@ zip -r Sparkle-test-1.1.zip Sparkle-test.app
 
 # Sign it with your private key using Sparkle's sign_update tool
 ./bin/sign_update Sparkle-test-1.1.zip
-# → prints the sparkle:edSignature value to paste into the appcast
+# → prints the sparkle:edSignature and size in bytes values to paste into the appcast
 ```
 
 ### 5c. Host the Appcast
@@ -124,30 +118,32 @@ Replace the placeholder `SUFeedURL` in `Sparkle-test/Info.plist`:
 
 ```xml
 <key>SUFeedURL</key>
-<string>https://your-server.example.com/appcast.xml</string>
+<string>https://raw.githubusercontent.com/GitHub_user/GitHub_repo/main/appcast.xml</string>
 ```
-
----
 
 ## 6. Sandbox Entitlements Explained
 
-The file `Sparkle-test/Sparkle-test.entitlements` contains:
+The file `Sparkle-test.entitlements` contains:
 
-| Key | Value | Purpose |
-|---|---|---|
-| `com.apple.security.app-sandbox` | `true` | Enables the macOS App Sandbox |
-| `com.apple.security.network.client` | `true` | Allows outgoing connections (appcast + update download) |
-| `com.apple.security.files.user-selected.read-only` | `true` | User-selected files: read-only access |
-| `com.apple.security.temporary-exception.mach-lookup.global-name` | `[…-spks, …-spki]` | Allows communication with Sparkle's XPC helper services |
-| `com.apple.security.temporary-exception.shared-preference.read-write` | `[bundle-id]` | Allows Sparkle to store update state in shared defaults |
+- com.apple.security.app-sandbox: true
+   - Enables the macOS App Sandbox
+- com.apple.security.network.client: true
+   - Allows outgoing connections (appcast + update download)
+- com.apple.security.files.user-selected.read-only: true
+   - User-selected files: read-only access
+- com.apple.security.temporary-exception.mach-lookup.global-name: […-spks, …-spki]
+   - Allows communication with Sparkle's XPC helper services
+- com.apple.security.temporary-exception.shared-preference.read-write: [bundle-id]
+   - Allows Sparkle to store update state in shared defaults
 
-> **Why temporary exceptions?**  
-> Sparkle 2 uses two private XPC services bundled inside `Sparkle.framework`:  
-> • `Sparkle Downloader.xpc` — downloads updates from the network  
-> • `Sparkle Installer.xpc` — applies updates to the app bundle  
-> The `mach-lookup` exceptions allow the sandboxed app to find and communicate with these services.
+**Why temporary exceptions?**
 
----
+Sparkle 2 uses two private XPC services bundled inside `Sparkle.framework`:
+
+- `Sparkle Downloader.xpc` — downloads updates from the network
+- `Sparkle Installer.xpc` — applies updates to the app bundle. 
+
+The `mach-lookup` exceptions allow the sandboxed app to find and communicate with these services.
 
 ## 7. Build & Run
 
@@ -155,8 +151,6 @@ The file `Sparkle-test/Sparkle-test.entitlements` contains:
 2. Press **⌘R** to build and run.
 3. The app window shows the current version and a **Check for Updates…** button.
 4. The button is disabled until Sparkle finishes its startup check; it becomes enabled after a few seconds.
-
----
 
 ## 8. Testing the Update Flow (End-to-End)
 
@@ -171,8 +165,6 @@ Point `SUFeedURL` in `Info.plist` to `http://localhost:8080/appcast.xml` tempora
 
 > **Note:** For local testing you can omit `SUPublicEDKey` and remove the `SURequireSignedFeed` key, but **always re-enable them** for production.
 
----
-
 ## 9. Creating a Distributable Build
 
 Since this app will **not be notarized** (signed ad-hoc with your Apple ID):
@@ -180,28 +172,23 @@ Since this app will **not be notarized** (signed ad-hoc with your Apple ID):
 1. Archive the app: **Product → Archive** in Xcode.
 2. In the Organizer, click **Distribute App** → **Direct Distribution** (or **Copy App**).
 3. The resulting `.app` bundle can be run on **your own Mac** without Gatekeeper issues  
-   (Gatekeeper will block it on other Macs unless notarized or the user right-clicks → Open).
-
----
+   (Gatekeeper will block it on other Macs unless notarized or the user removes the quarantine attribute).
 
 ## 10. Project File Structure
 
 ```
 Sparkle-test/
-├── Sparkle-test.xcodeproj/          Xcode project (open this)
+├── Sparkle-test.xcodeproj/             Xcode project (open this)
 │   └── project.pbxproj
-├── Sparkle-test/                    Swift source & resources
-│   ├── Sparkle_testApp.swift        App entry point; initialises SPUStandardUpdaterController
-│   ├── ContentView.swift            Main window: version text + Check for Updates button
+├── Sparkle-test/                       Swift source & resources
+│   ├── Sparkle_testApp.swift           App entry point; initialises SPUStandardUpdaterController
+│   ├── ContentView.swift               Main window: version text + Check for Updates button
 │   ├── CheckForUpdatesViewModel.swift  ObservableObject that reflects canCheckForUpdates
-│   ├── Info.plist                   App metadata + Sparkle keys (SUFeedURL, SUPublicEDKey…)
-│   ├── Sparkle-test.entitlements    Sandbox + network + Sparkle mach exceptions
-│   └── Assets.xcassets/             App icon + accent colour
-├── SETUP_INSTRUCTIONS.md            This file
+│   ├── Info.plist                      App metadata + Sparkle keys (SUFeedURL, SUPublicEDKey…)
+│   ├── Sparkle-test.entitlements       Sandbox + network + Sparkle mach exceptions
+│   └── Assets.xcassets/                App icon + accent colour
 └── LICENSE
 ```
-
----
 
 ## 11. Key Sparkle 2 Info.plist Settings
 
@@ -213,7 +200,6 @@ Sparkle-test/
 | `SUEnableSystemProfiling` | Set `false` to disable anonymous analytics |
 | `SUScheduledCheckInterval` | Seconds between automatic update checks (default: 86400 = 1 day) |
 
----
 
 ## 12. Troubleshooting
 
@@ -225,8 +211,6 @@ Sparkle-test/
 | "Update can't be installed" | Missing `SUEnableInstallerLauncherService` | Add/verify that key is `true` in `Info.plist` |
 | Signature verification fails | Wrong or missing `SUPublicEDKey` | Re-generate keys and update `Info.plist` |
 | App not opening on another Mac | Not notarized | Right-click the app → Open; or notarize for distribution |
-
----
 
 ## References
 
