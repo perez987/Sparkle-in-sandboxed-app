@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Sparkle-test</title>
+    <item>
+      <title>Version 1.0.1</title>
+      <sparkle:version>4</sparkle:version>
+      <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <pubDate>Fri, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <enclosure
+        url="https://github.com/perez987/Sparkle-test/releases/download/1.0.1/Sparkle-test-1.0.1.zip"
+        sparkle:edSignature="mLeZXYNB+dU5AKB5oldJde3htdST9S3dKXcy8jq9iswZVRTimLLgEqnZsSEmnFUFIjajRAJ3KzGV8e2e5N1NCQ=="
+        length="1140632"
+        type="application/octet-stream"
+      />
+    </item>
+  </channel>
+</rss>
