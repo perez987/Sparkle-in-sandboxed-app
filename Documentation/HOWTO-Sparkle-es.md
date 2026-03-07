@@ -1,14 +1,14 @@
 # Sparkle-test: Instrucciones de configuración
 
-Este archivo describe todo lo que necesitas hacer después de clonar este repositorio para compilar y ejecutar **Sparkle-test**, una app macOS SwiftUI con sandbox que utiliza el framework de actualizaciones [Sparkle](https://sparkle-project.org/) (v2.x).
+Este archivo describe lo que necesitas hacer después de clonar este repositorio para compilar y ejecutar **Sparkle-test**, una app hecha en SwiftUI para macOS con aislamiento (`sandbox`) que utiliza el *framework* de actualizaciones Sparkle (v2.x).
 
 ## 1. Requisitos previos
 
 | Requisito | Versión |
 |---|---|
 | Xcode | 15+ |
-| macOS | 13 Sonoma o posterior (host de compilación) |
-| Cuenta de Apple Developer | Necesaria para la firma de código |
+| macOS | 13 Sonoma o posterior |
+| Apple ID o Apple Developer | Necesaria para la firma de código |
 | Sparkle | 2.x — añadido mediante Swift Package Manager |
 
 ## 2. Abrir el proyecto en Xcode
@@ -16,12 +16,12 @@ Este archivo describe todo lo que necesitas hacer después de clonar este reposi
 1. Abre `Sparkle-test.xcodeproj` en Xcode.
 2. Xcode resolverá automáticamente la dependencia del paquete Swift **Sparkle** desde  
    `https://github.com/sparkle-project/Sparkle` (versión ≥ 2.0.0).  
-   Espera a que el indicador "Resolving Package Graph" termine.
+   Espera a que el indicador de progreso "Resolving Package Graph" termine.
 
 ## 3. Configurar la firma de código
 
 1. En Xcode, selecciona el proyecto **Sparkle-test** en el Navegador de proyectos.
-2. Selecciona el target **Sparkle-test** → **Signing & Capabilities**.
+2. Selecciona el `target` **Sparkle-test** → **Signing & Capabilities**.
 3. En **Signing**:
    - Establece **Team** con tu Apple ID.
    - Mantén **Automatically manage signing** activado.
@@ -30,13 +30,13 @@ Este archivo describe todo lo que necesitas hacer después de clonar este reposi
 
 ### Sobre la firma "ad-hoc" con tu Apple ID
 
-Para otros usuarios que ejecuten esta app (fuera del App Store), no necesitan un certificado de Developer ID, pero recibirán una advertencia de Gatekeeper la primera vez que ejecuten la app.
+Para usuarios que ejecuten esta app, no necesitan un certificado de Developer ID pero recibirán una advertencia de Gatekeeper la primera vez que ejecuten la app.
 
-En versiones anteriores a Sequoia, la advertencia de Gatekeeper para archivos descargados de Internet tenía una solución sencilla: aceptar la advertencia al abrir el archivo o hacer clic derecho sobre él >> Abrir.
+En versiones anteriores a Sequoia, la advertencia de Gatekeeper para archivos descargados de Internet tenía una solución sencilla: aceptar la advertencia al abrir el archivo o hacer clic derecho → Abrir.
 
-Pero en Sequoia y Tahoe, la advertencia es más alarmante y podría inquietar al usuario. La solución es eliminar el atributo `com.apple.quarantine` para que, a partir de ese momento, puedas ejecutar la app sin problemas.
+Pero en Sequoia y Tahoe la advertencia es más alarmante y podría inquietar al usuario. La solución es eliminar el atributo `com.apple.quarantine` para que, a partir de ese momento, puedas ejecutar la app sin problemas.
 
-Puedes leer sobre esto en [La app está dañada y no se puede abrir](APP-damaged.md).
+Puedes leer sobre esto en [La app está dañada y no se puede abrir](APP-damaged-es.md).
 
 ## 4. Generar las claves EdDSA de Sparkle
 
@@ -45,32 +45,32 @@ Debes generar un par de claves y añadir la **clave pública** a `Info.plist`.
 
 ### Pasos
 
-1. Localiza `generate_keys` dentro del paquete Sparkle resuelto (Xcode descarga los paquetes en `~/Library/Developer/Xcode/DerivedData/<proyecto>/SourcePackages/`) o descarga `Sparkle-2.x.x.tar.xz` desde las [releases](https://github.com/sparkle-project/Sparkle/releases) de GitHub
-2. Extrae la distribución binaria y ejecuta `generate_keys`
+1. Localiza `generate_keys` dentro del paquete Sparkle (Xcode descarga los paquetes en `~/Library/Developer/Xcode/DerivedData/<proyecto>/SourcePackages/`) o descarga `Sparkle-2.x.x.tar.xz` desde las [descargas](https://github.com/sparkle-project/Sparkle/releases) de GitHub
+2. Extrae la distribución y ejecuta `generate_keys`
 
 ```bash
 ./bin/generate_keys
 ```
 
-La herramienta:
+Este comando:
 
-- Imprimirá una **clave privada** — por defecto, Sparkle la guarda en el Keychain de macOS. **Nunca la incluyas en el repositorio.**
-- Imprimirá una **clave pública** (cadena en Base64).
+- Imprime una **clave privada** — por defecto, Sparkle la guarda en el Keychain de macOS. **Nunca la incluyas en el repositorio.**
+- Imprime una **clave pública** (cadena en Base64).
 
 ### Añadir la clave pública a Info.plist
 
-Abre `Sparkle-test/Info.plist` y reemplaza `REPLACE_WITH_YOUR_PUBLIC_ED_KEY`:
+Añade esto al archivo Info.plist:
 
 ```xml
 <key>SUPublicEDKey</key>
-<string>TU_CLAVE_PUBLICA_BASE64_AQUI</string>
+<string>TU_CLAVE_PUBLICA_BASE64</string>
 ```
 
-**Importante:** Sin el `SUPublicEDKey` correcto, Sparkle se negará a instalar actualizaciones.
+**Importante:** Con `SUPublicEDKey` erróneo, Sparkle se negará a instalar actualizaciones.
 
-## 5. Configurar un feed Appcast
+## 5. Configurar appcast.xml
 
-Sparkle consulta un feed XML remoto ("appcast") para descubrir nuevas versiones.
+Sparkle consulta un *feed* XML remoto ("appcast") para descubrir nuevas versiones.
 
 ### 5a. Crear el XML del Appcast
 
@@ -87,7 +87,7 @@ Sparkle consulta un feed XML remoto ("appcast") para descubrir nuevas versiones.
       <pubDate>Fri, 01 Jan 2025 12:00:00 +0000</pubDate>
       <enclosure
         url="https://github.com/perez987/Sparkle-test/releases/download/1.0.1/Sparkle-test-1.0.1.zip"
-        sparkle:edSignature="TU_FIRMA_ED"
+        sparkle:edSignature="FIRMA_EdDSA"
         length="1234567"
         type="application/octet-stream"
       />
@@ -96,31 +96,49 @@ Sparkle consulta un feed XML remoto ("appcast") para descubrir nuevas versiones.
 </rss>
 ```
 
+#### Componentes del archivo appcast.xml
+
+- `link`: dirección web del repositorio
+- `language`: lenguage predefinido
+- `item`: permite tener varias versiones en el mismo appcast
+- `title`: número de versión de la app
+- `description` vacía: Sparkle muestra un diálogo de actualización pequeño, sin notas de versión
+- `description` con texto HTML entre CDATA etiquetas HTML: Sparkle muestra un diálogo más grande con notas de la versión
+- `enclosure`: datos específicos de la versión
+	- `url` -> enlace al archivo ZIP
+	- `sparkle:version` -> número de compilación del proyecto(`CURRENT_PROJECT_VERSION` = `CFBundleVersion`)
+	- `sparkle:shortVersionString`-> número de versión de la app (`MARKETING_VERSION`)
+	- `length` -> tamaño del ZIP
+	- `sparkle:edSignature` -> firma pública EdDSA para verificar la integridad de la actualización
+	- `type` -> "application/octet-stream"
+	- `minimumSystemVersion` -> version mínima de macOS.
+
 ### 5b. Firmar el paquete de actualización
 
 ```bash
-# Genera el .zip del bundle .app de la nueva versión
+# Genera .zip de la .app con la nueva versión:
 zip -r Sparkle-test-1.1.zip Sparkle-test.app
 
-# Fírmalo con tu clave privada usando la herramienta sign_update de Sparkle
+# Fírmalo con tu clave privada usando la herramienta sign_update de Sparkle:
 ./bin/sign_update Sparkle-test-1.1.zip
-# → imprime el tamaño (en bytes) y el sparkle:edSignature para pegar en el appcast
 ```
+
+Se muestra el tamaño en bytes (`length`) y la firma EdDSA (`sparkle:edSignature`) para rellenar el archivo appcast.
 
 ### 5c. Alojar el Appcast
 
-Sube `appcast.xml` a la raíz del repositorio y el archivo `.zip` a la página de releases.
+Sube `appcast.xml` a la raíz del repositorio y el archivo `.zip` a la página de *releases*.
 
 ### 5d. Actualizar Info.plist
 
-Reemplaza el marcador `SUFeedURL` en `Sparkle-test/Info.plist`:
+Rellena el valor de la propiedad `SUFeedURL` en `Info.plist`:
 
 ```xml
 <key>SUFeedURL</key>
-<string>https://raw.githubusercontent.com/usuario_GitHub/repo_GitHub/main/appcast.xml</string>
+<string>https://raw.githubusercontent.com/perez987/Sparkle-test/main/appcast.xml</string>
 ```
 
-## 6. Explicación de los Sandbox Entitlements
+## 6. Explicación del archivo Entitlements
 
 El archivo `Sparkle-test.entitlements` contiene:
 
@@ -135,25 +153,25 @@ El archivo `Sparkle-test.entitlements` contiene:
 - com.apple.security.temporary-exception.shared-preference.read-write: [bundle-id]
    - Permite a Sparkle almacenar el estado de las actualizaciones en los valores predeterminados compartidos
 
-**¿Por qué excepciones temporales?**
+**¿Por qué las excepciones temporales?**
 
 Sparkle 2 usa dos servicios XPC privados incluidos dentro de `Sparkle.framework`:
 
 - `Sparkle Downloader.xpc` — descarga actualizaciones de la red
-- `Sparkle Installer.xpc` — aplica las actualizaciones al bundle de la app
+- `Sparkle Installer.xpc` — aplica las actualizaciones a la app
 
-Las excepciones `mach-lookup` permiten a la app con sandbox encontrar y comunicarse con estos servicios.
+Las excepciones `mach-lookup` permiten a la app con `sandbox` encontrar y comunicarse con estos servicios.
 
 ## 7. Compilar y ejecutar
 
-1. Selecciona el scheme **Sparkle-test** y tu Mac como destino.
+1. Selecciona el esquema **Sparkle-test** y tu Mac como destino.
 2. Pulsa **⌘R** para compilar y ejecutar.
 3. La ventana de la app muestra la versión actual y un botón **Check for Updates…**.
 4. El botón está desactivado hasta que Sparkle termina su comprobación inicial; se activa después de unos segundos.
 
-## 8. Probar el flujo de actualización (de extremo a extremo)
+## 8. Probar el flujo de actualización
 
-Para probar un ciclo de actualización completo sin un servidor público, puedes usar un servidor HTTP local:
+Para probar un ciclo de actualización completo sin un servidor, puedes usar un servidor HTTP local:
 
 ```bash
 # Sirve archivos en localhost:8080
@@ -164,27 +182,27 @@ Apunta temporalmente `SUFeedURL` en `Info.plist` a `http://localhost:8080/appcas
 
 > **Nota:** Para pruebas locales puedes omitir `SUPublicEDKey` y eliminar la clave `SURequireSignedFeed`, pero **vuelve a activarlas siempre** en producción.
 
-## 9. Crear una build distribuible
+## 9. Crear la app para distribución
 
-Dado que esta app **no será notarizada** (firmada ad-hoc con tu Apple ID):
+Dado que esta app **no será notarizada** (está firmada ad-hoc con tu Apple ID):
 
 1. Archiva la app: **Product → Archive** en Xcode.
 2. En el Organizador, haz clic en **Distribute App** → **Direct Distribution** (o **Copy App**).
-3. El bundle `.app` resultante puede ejecutarse en **tu propio Mac** sin problemas de Gatekeeper  
-   (Gatekeeper lo bloqueará en otros Macs a menos que esté notarizado o el usuario elimine el atributo de cuarentena).
+3. El paquete `.app` resultante puede ejecutarse en **tu propio Mac** sin problemas de Gatekeeper  
+   (Gatekeeper la bloqueará en otros Macs a menos que el usuario elimine el atributo de cuarentena).
 
 ## 10. Estructura de archivos del proyecto
 
 ```
 Sparkle-test/
-├── Sparkle-test.xcodeproj/             Proyecto Xcode (abre este)
+├── Sparkle-test.xcodeproj/             Archivo de proyecto Xcode)
 │   └── project.pbxproj
 ├── Sparkle-test/                       Código fuente Swift y recursos
 │   ├── Sparkle_testApp.swift           Punto de entrada de la app; inicializa SPUStandardUpdaterController
 │   ├── ContentView.swift               Ventana principal: texto de versión + botón Check for Updates
 │   ├── CheckForUpdatesViewModel.swift  ObservableObject que refleja canCheckForUpdates
 │   ├── Info.plist                      Metadatos de la app + claves de Sparkle (SUFeedURL, SUPublicEDKey…)
-│   ├── Sparkle-test.entitlements       Sandbox + red + excepciones mach de Sparkle
+│   ├── Sparkle-test.entitlements       Sandbox + red + excepciones de Sparkle
 │   └── Assets.xcassets/                Icono de la app + color de énfasis
 └── LICENSE
 ```
@@ -194,8 +212,8 @@ Sparkle-test/
 | Clave | Descripción |
 |---|---|
 | `SUFeedURL` | **Obligatorio**: URL HTTPS a tu `appcast.xml` |
-| `SUPublicEDKey` | **Obligatorio en producción**: Clave pública Ed25519 en Base64 para verificación de actualizaciones |
-| `SUEnableInstallerLauncherService` | **Obligatorio con sandbox**: Permite a Sparkle lanzar su servicio XPC instalador |
+| `SUPublicEDKey` | **Obligatorio en producción**: Clave pública EdDSA en Base64 para verificación de actualizaciones |
+| `SUEnableInstallerLauncherService` | **Obligatorio con sandbox**: Permite a Sparkle lanzar su servicio instalador XPC |
 | `SUEnableSystemProfiling` | Establece `false` para desactivar el análisis anónimo |
 | `SUScheduledCheckInterval` | Segundos entre comprobaciones automáticas de actualizaciones (predeterminado: 86400 = 1 día) |
 
@@ -204,10 +222,10 @@ Sparkle-test/
 | Síntoma | Causa probable | Solución |
 |---|---|---|
 | "Check for Updates" siempre desactivado | El actualizador no pudo iniciarse | Comprueba la Consola para errores de Sparkle; asegúrate de que `SUFeedURL` sea accesible |
-| Violación de sandbox en la Consola | Entitlement faltante | Verifica que las excepciones `mach-lookup` en el archivo de entitlements coincidan con el bundle ID |
-| La descarga de la actualización falla silenciosamente | Entitlement `network.client` faltante o URL incorrecta | Comprueba los entitlements; verifica que la URL del appcast sea HTTPS |
-| "La actualización no puede instalarse" | `SUEnableInstallerLauncherService` faltante | Añade/verifica que esa clave sea `true` en `Info.plist` |
-| La verificación de firma falla | `SUPublicEDKey` incorrecto o faltante | Regenera las claves y actualiza `Info.plist` |
+| Violación de sandbox en la Consola | Falta *entitlements* | Verifica que las excepciones `mach-lookup` en el archivo entitlements coincidan con  `bundle ID` |
+| La descarga de la actualización falla silenciosamente | Falta *entitlement* `network.client` o URL incorrecta | Comprueba *entitlements*; verifica que la URL del appcast sea HTTPS |
+| "La actualización no puede instalarse" | Falta `SUEnableInstallerLauncherService` | Añade/verifica que esa clave sea `true` en `Info.plist` |
+| La verificación de firma falla | Falta `SUPublicEDKey` o es incorrecta | Regenera las claves y actualiza `Info.plist` |
 | La app no se abre en otro Mac | No notarizada | - Clic derecho en la app → Abrir<br>- Eliminar el atributo de cuarentena<br>- Si tienes cuenta de Apple Developer, notariza para distribución |
 
 ## Referencias

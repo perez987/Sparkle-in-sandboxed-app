@@ -7,8 +7,8 @@ This file describes everything you need to do after cloning this repository to b
 | Requirement | Version |
 |---|---|
 | Xcode | 15+ |
-| macOS | 13 Sonoma or later (build host) |
-| Apple Developer Account | Required for code signing |
+| macOS | 13 Sonoma or later |
+| Apple ID or Developer Account | Required for code signing |
 | Sparkle | 2.x — added via Swift Package Manager |
 
 ## 2. Open the Project in Xcode
@@ -45,7 +45,7 @@ You must generate a key pair and add the **public key** to `Info.plist`.
 
 ### Steps
 
-1. Locate generate_keys inside the resolved Sparkle package (Xcode downloads packages to `~/Library/Developer/Xcode/DerivedData/<project>/SourcePackages/`) or download Sparkle-2.x.x.tar.xz from GitHub [releases](https://github.com/sparkle-project/Sparkle/releases)
+1. Locate `generate_keys` inside the Sparkle package (Xcode downloads packages to `~/Library/Developer/Xcode/DerivedData/<project>/SourcePackages/`) or download Sparkle-2.x.x.tar.xz from GitHub [releases](https://github.com/sparkle-project/Sparkle/releases)
 2. Extract the binary distribution and run generate_keys
 
 ```bash
@@ -59,11 +59,11 @@ The tool will:
 
 ### Add the Public Key to Info.plist
 
-Open `Sparkle-test/Info.plist` and replace `REPLACE_WITH_YOUR_PUBLIC_ED_KEY`:
+Add this to the `Info.plist` file:
 
 ```xml
 <key>SUPublicEDKey</key>
-<string>YOUR_BASE64_PUBLIC_KEY_HERE</string>
+<string>YOUR_BASE64_PUBLIC_KEY</string>
 ```
 
 **Important:** Without the correct `SUPublicEDKey`, Sparkle will refuse to install updates.
@@ -87,7 +87,7 @@ Sparkle checks a remote XML feed ("appcast") to discover new versions.
       <pubDate>Fri, 01 Jan 2025 12:00:00 +0000</pubDate>
       <enclosure
         url="https://github.com/perez987/Sparkle-test/releases/download/1.0.1/Sparkle-test-1.0.1.zip"
-        sparkle:edSignature="YOUR_ED_SIGNATURE"
+        sparkle:edSignature="ED_SIGNATURE"
         length="1234567"
         type="application/octet-stream"
       />
@@ -95,6 +95,23 @@ Sparkle checks a remote XML feed ("appcast") to discover new versions.
   </channel>
 </rss>
 ```
+
+#### appcast.xml components:
+
+- link: repository web address
+- language: predefined language
+- item: to set more than one release
+- title: you can set the version number
+- description empty: Sparkle displays a smaller update dialog, without version notes
+- description with HTML text between CDATA tags: Sparkle displays a larger update dialog where we can see the release notes
+- enclosure: version-specific data
+	- url -> link to the app ZIP file
+	- sparkle:version -> project build number (`CURRENT_PROJECT_VERSION`)
+	- sparkle:shortVersionString-> app version (`MARKETING_VERSION`)
+	- length -> app ZIP file in bytes
+	- sparkle:edSignature -> public EdDSA key for verifying update signatures
+	- type -> "application/octet-stream"
+	- minimumSystemVersion -> min. version of Xcode target
 
 ### 5b. Sign the Update Package
 
@@ -104,8 +121,9 @@ zip -r Sparkle-test-1.1.zip Sparkle-test.app
 
 # Sign it with your private key using Sparkle's sign_update tool
 ./bin/sign_update Sparkle-test-1.1.zip
-# → prints the size (in bytes) and the sparkle:edSignature to paste into the appcast (sparkle:edSignature and length)
 ```
+
+Prints the ZIP size in bytes (`length`) and the EdDSA signature (`sparkle:edSignature`) to paste into the appcast.
 
 ### 5c. Host the Appcast
 
@@ -117,7 +135,7 @@ Replace the placeholder `SUFeedURL` in `Sparkle-test/Info.plist`:
 
 ```xml
 <key>SUFeedURL</key>
-<string>https://raw.githubusercontent.com/GitHub_user/GitHub_repo/main/appcast.xml</string>
+<string>https://raw.githubusercontent.com/perez987/Sparkle-test/main/appcast.xml</string>
 ```
 
 ## 6. Sandbox Entitlements Explained
@@ -177,7 +195,7 @@ Since this app will **not be notarized** (signed ad-hoc with your Apple ID):
 
 ```
 Sparkle-test/
-├── Sparkle-test.xcodeproj/             Xcode project (open this)
+├── Sparkle-test.xcodeproj/             Xcode project file
 │   └── project.pbxproj
 ├── Sparkle-test/                       Swift source & resources
 │   ├── Sparkle_testApp.swift           App entry point; initialises SPUStandardUpdaterController
@@ -194,7 +212,7 @@ Sparkle-test/
 | Key | Description |
 |---|---|
 | `SUFeedURL` | **Required**: HTTPS URL to your `appcast.xml` |
-| `SUPublicEDKey` | **Required for production**: Base64 Ed25519 public key for update verification |
+| `SUPublicEDKey` | **Required for production**: Base64 EdDSA public key for update verification |
 | `SUEnableInstallerLauncherService` | **Required for sandbox**: Allows Sparkle to launch its installer XPC service |
 | `SUEnableSystemProfiling` | Set `false` to disable anonymous analytics |
 | `SUScheduledCheckInterval` | Seconds between automatic update checks (default: 86400 = 1 day) |
