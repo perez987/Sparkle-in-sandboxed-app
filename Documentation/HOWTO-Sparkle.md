@@ -98,20 +98,20 @@ Sparkle checks a remote XML feed ("appcast") to discover new versions.
 
 #### appcast.xml components:
 
-- link: repository web address
-- language: predefined language
-- item: to set more than one release
-- title: you can set the version number
-- description empty: Sparkle displays a smaller update dialog, without version notes
-- description with HTML text between CDATA tags: Sparkle displays a larger update dialog where we can see the release notes
-- enclosure: version-specific data
-	- url -> link to the app ZIP file
-	- sparkle:version -> project build number (`CURRENT_PROJECT_VERSION`)
-	- sparkle:shortVersionString-> app version (`MARKETING_VERSION`)
-	- length -> app ZIP file in bytes
-	- sparkle:edSignature -> public EdDSA key for verifying update signatures
-	- type -> "application/octet-stream"
-	- minimumSystemVersion -> min. version of Xcode target
+- `link`: repository web address
+- `language`: predefined language
+- `item`: to set more than one release
+- `title`: you can set the version number
+- `description` empty: Sparkle displays a smaller update dialog, without version notes
+- `description` with HTML text between CDATA tags: Sparkle displays a larger update dialog where we can see the release notes
+- `enclosure`: version-specific data
+	- `url` -> link to the app ZIP file
+	- `sparkle:version` -> project build number (`CURRENT_PROJECT_VERSION`)
+	- `sparkle:shortVersionString`-> app version (`MARKETING_VERSION`)
+	- `length` -> app ZIP file in bytes
+	- `sparkle:edSignature` -> public EdDSA key for verifying update signatures
+	- `type` -> "application/octet-stream"
+	- `minimumSystemVersion` -> min. version of Xcode target
 
 ### 5b. Sign the Update Package
 
