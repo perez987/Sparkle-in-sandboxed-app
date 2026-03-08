@@ -7,6 +7,7 @@ struct Sparkle_testApp: App {
 
     var body: some Scene {
         WindowGroup {
+            ContentView()
         }
         .windowResizability(.contentSize)
         .commands {
