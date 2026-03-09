@@ -3,15 +3,15 @@
   <channel>
     <title>Sparkle-test</title>
     <item>
-      <title>Version 1.0.1</title>
-      <sparkle:version>4</sparkle:version>
-      <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+      <title>Version 1.1.0</title>
+      <sparkle:version>8</sparkle:version>
+      <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <pubDate>Fri, 01 Jan 2025 12:00:00 +0000</pubDate>
       <enclosure
-        url="https://github.com/perez987/Sparkle-test/releases/download/1.0.1/Sparkle-test-1.0.1.zip"
-        sparkle:edSignature="/1t6evfclBYecpB/V9vVGzMuSHfCQpBQiQHip3EdaO8mP//nTItHNY/HBcNhBXm+y4LLkNSLyDulnospsUQxBg=="
-        length="1421658"
+        url="https://github.com/perez987/Sparkle-test/releases/download/1.1.0/Sparkle-test-1.1.0.zip"
+        sparkle:edSignature="IvvB+WVHWApNAMczRQZHEKDM1jxBvWRO3a46g/AD8WlXQ+R2BArQpkjpVdL1qwWNuTW97XXbqMOxzhdhOZeFBQ=="
+        length="1425723"
         type="application/octet-stream"
       />
     </item>
