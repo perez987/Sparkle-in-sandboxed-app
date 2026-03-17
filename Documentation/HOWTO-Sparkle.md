@@ -1,6 +1,6 @@
 # Sparkle-in-a-sandboxed-app: Setup Instructions
 
-This file describes everything you need to do after cloning this repository to build and run **Sparkle-test**, a sandboxed SwiftUI macOS app that uses the Sparkle update framework (v2.x).
+This file describes everything you need to do after cloning this repository to build and run **Sparkle-test**, a sandboxed SwiftUI macOS app that uses the Sparkle update framework (v2.x). This example will help you add the Sparkle updater to a SwiftUI sandboxed app.
 
 ## 1. Prerequisites
 
