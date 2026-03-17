@@ -84,9 +84,9 @@ Sparkle checks a remote XML feed ("appcast") to discover new versions.
       <sparkle:version>4</sparkle:version>
       <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <pubDate>Fri, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <pubDate>Sat, 14 Mar 2026 12:45:43 +0000</pubDate>
       <enclosure
-        url="https://github.com/perez987/Sparkle-test/releases/download/1.0.1/Sparkle-test-1.0.1.zip"
+        url="https://github.com/perez987/Sparkle-in-a-sandboxed-app/download/1.0.1/Sparkle-test-1.0.1.zip"
         sparkle:edSignature="ED_SIGNATURE"
         length="1234567"
         type="application/octet-stream"
@@ -108,6 +108,7 @@ Sparkle checks a remote XML feed ("appcast") to discover new versions.
 	- `url` -> link to the app ZIP file
 	- `sparkle:version` -> project build number (`CURRENT_PROJECT_VERSION`)
 	- `sparkle:shortVersionString`-> app version (`MARKETING_VERSION`)
+    - `pubDate`-> release date and time
 	- `length` -> app ZIP file in bytes
 	- `sparkle:edSignature` -> public EdDSA key for verifying update signatures
 	- `type` -> "application/octet-stream"
@@ -135,7 +136,7 @@ Replace the placeholder `SUFeedURL` in `Sparkle-test/Info.plist`:
 
 ```xml
 <key>SUFeedURL</key>
-<string>https://raw.githubusercontent.com/perez987/Sparkle-test/main/appcast.xml</string>
+<string>https://raw.githubusercontent.com/perez987/Sparkle-in-a-sandboxed-app/main/appcast.xml</string>
 ```
 
 ## 6. Sandbox Entitlements Explained
